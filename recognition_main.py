@@ -110,12 +110,18 @@ def test_models(f_models, f_names, files):
         else:
             real_male_sample += 1
 
-    print('Actual values: M ', int(real_male_sample), " ; Correct M found: ", int(real_male_hits), ' ; Correct : ',
-          (real_male_hits / real_male_sample) * 100, "%")
-    print('Actual values: K ', int(real_female_sample), " ; Correct F found: ", int(real_female_hits), ' ; Correct : ',
-          (real_female_hits / real_female_sample) * 100, "%")
-    print('Total correct: ', real_female_hits + real_male_hits, " out of ", real_female_sample + real_male_sample,
-          ' ; Correct : ', (real_female_hits + real_male_hits) / (real_female_sample + real_male_sample) * 100, "%")
+    if real_male_sample > 0:
+        print('Actual values: M ', int(real_male_sample), " ; Correct M found: ", int(real_male_hits),
+              ' ; Correct : ', (real_male_hits / real_male_sample) * 100, "%")
+
+    if real_female_sample > 0:
+        print('Actual values: K ', int(real_female_sample), " ; Correct F found: ", int(real_female_hits),
+              ' ; Correct : ', (real_female_hits / real_female_sample) * 100, "%")
+
+    if real_male_sample + real_female_sample > 0:
+        print('Total correct: ', real_female_hits + real_male_hits, " out of ", real_female_sample + real_male_sample,
+              ' ; Correct : ', (real_female_hits + real_male_hits) / (real_female_sample + real_male_sample) * 100, "%")
+
     return 0
 
 
@@ -178,10 +184,11 @@ def main():
                 best_score = int(np.argmax(score))
                 print(sys.argv[i], " : ", names[best_score])
             except IOError:
-                sys.exit("Cannot read argument!")
+                sys.exit(str("Cannot read argument number " + str(i) + "!"))
 
     # Method to predict from folder path (default is 'test/*.wav')
-    # test_models(models, names, glob.glob("test/*.wav"))  # Calculates overall accuracy, accepts .wav files,
+    # if len(glob.glob("train/*.wav")) > 0:
+    #    test_models(models, names, glob.glob("train/*.wav"))  # Calculates overall accuracy, accepts .wav files,
     # female file MUST have a letter 'K' in file name, male must NOT have a 'K' in file name
 
     male_model.save_variables()
