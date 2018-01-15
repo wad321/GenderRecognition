@@ -56,8 +56,7 @@ class GmmModel:
 
 def gen_feature(rate, data):
     feature = mfcc.mfcc(data, rate / 2, winlen=winlen, winstep=winstep, numcep=numcep, appendEnergy=False, nfft=1024)
-    feature = preprocessing.scale(feature)
-    return feature
+    return preprocessing.scale(feature)
 
 
 def create_gmm(files):
@@ -87,10 +86,8 @@ def test_models(f_models, f_names, files):
         feature = gen_feature(wav_rate, wav_waves)
         score = np.zeros(number_of_models)
         for i in range(number_of_models):
-            model = f_models[i]
-            score[i] = np.array(model.score(feature)).sum()
-        best_score = np.argmax(score)
-        names_output[best_score] += 1
+            score[i] = np.array(f_models[i].score(feature)).sum()
+        names_output[np.argmax(score)] += 1
         print(file, " : ", f_names[best_score])
         if 'K' in file and 'K' in f_names[best_score]:
             real_female_hits += 1
@@ -167,6 +164,11 @@ def main():
     else:
         female_model = GmmModel()
         female_model.gmm = create_gmm(train_f)
+        
+    male_model.save_variables()
+    female_model.save_variables()
+    joblib.dump(male_model, "models/male_model.pkl")
+    joblib.dump(female_model, "models/female_model.pkl")
 
     number_of_args = len(sys.argv)
     models = (male_model.gmm, female_model.gmm)
@@ -179,10 +181,8 @@ def main():
                 feature = gen_feature(wav_rate, wav_waves)
                 score = np.zeros(2)
                 for j in range(2):
-                    model = models[j]
-                    score[j] = np.array(model.score(feature)).sum()
-                best_score = int(np.argmax(score))
-                print(sys.argv[i], " : ", names[best_score])
+                    score[j] = np.array(models[j].score(feature)).sum()
+                print(sys.argv[i], " : ", names[int(np.argmax(score))])
             except IOError:
                 sys.exit(str("Cannot read argument number " + str(i) + "!"))
                 
@@ -192,11 +192,6 @@ def main():
             test_models(models, names, glob.glob("test/*.wav"))  # Calculates overall accuracy, accepts .wav files,
     # female file MUST have a letter 'K' in file name, male must NOT have a 'K' in file name
 
-    male_model.save_variables()
-    female_model.save_variables()
-    joblib.dump(male_model, "models/male_model.pkl")
-    joblib.dump(female_model, "models/female_model.pkl")
-
-
+    
 if __name__ == "__main__":
     main()
