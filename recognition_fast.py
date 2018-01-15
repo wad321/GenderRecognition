@@ -81,7 +81,7 @@ def main():
                     score[j] = np.array(models[j].score(feature)).sum()
                 print(sys.argv[i], " : ", names[int(np.argmax(score))])
             except IOError:
-                sys.exit(str("Cannot read argument number " + str(i) + "!"))
+                print(str("Cannot read argument number " + str(i) + "!"))
 
 
 if __name__ == "__main__":
