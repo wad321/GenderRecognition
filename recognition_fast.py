@@ -13,6 +13,20 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+# Variables to change
+# Please be advised, changing arguments will result in preparing another model, which might be time consuming.
+male_training_size = len(glob.glob('male/*.wav'))  # Size of male training model,
+# max - (number of .wav files in 'male/')
+female_training_size = len(glob.glob('female/*.wav'))  # Size of female training model,
+# max - (number of .wav files in 'female/')
+n_components = 10  # Default: 1
+n_iter = 200  # Default: 100
+n_init = 5  # Default: 1
+winlen = 0.025  # Default: 0.025
+winstep = 0.01  # Default: 0.01
+numcep = 13  # Default: 13
+# End of variables to change
+
 
 def gen_feature(rate, data):
     feature = mfcc.mfcc(data, rate / 2, winlen=winlen, winstep=winstep, numcep=numcep, appendEnergy=False, nfft=1024)
