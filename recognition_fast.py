@@ -5,7 +5,6 @@ from scipy.io import wavfile
 from sklearn import preprocessing
 from sklearn.externals import joblib
 import glob
-import random
 import sys
 import os.path
 
@@ -13,8 +12,7 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-# Variables to change
-# Please be advised, changing arguments will result in preparing another model, which might be time consuming.
+# NOT CHANGEABLE!
 male_training_size = len(glob.glob('male/*.wav'))  # Size of male training model,
 # max - (number of .wav files in 'male/')
 female_training_size = len(glob.glob('female/*.wav'))  # Size of female training model,
@@ -25,7 +23,32 @@ n_init = 5  # Default: 1
 winlen = 0.025  # Default: 0.025
 winstep = 0.01  # Default: 0.01
 numcep = 13  # Default: 13
-# End of variables to change
+
+
+class GmmModel:
+    m_train = male_training_size
+    f_train = female_training_size
+    comp = n_components
+    iter = n_iter
+    init = n_init
+    winlen = winlen
+    winstep = winstep
+    numcep = numcep
+
+    def save_variables(self):
+        self.variable_list = [self.m_train, self.f_train, self.comp, self.iter,
+                              self.init, self.winlen, self.winstep, self.numcep]
+
+    def variable_check(self):
+        if not hasattr(self, 'variable_list'):
+            return False
+        elif self.m_train == self.variable_list[0] and self.f_train == self.variable_list[1] \
+                and self.comp == self.variable_list[2] and self.iter == self.variable_list[3] \
+                and self.init == self.variable_list[4] and self.winlen == self.variable_list[5] \
+                and self.winstep == self.variable_list[6] and self.numcep == self.variable_list[7]:
+            return True
+        else:
+            return False
 
 
 def gen_feature(rate, data):
@@ -36,15 +59,11 @@ def gen_feature(rate, data):
 def main():
     if os.path.isfile("models/male_model.pkl"):
         male_model = joblib.load("models/male_model.pkl")
-        if not male_model.variable_check():
-            sys.exit("No fast male model found!")
     else:
         sys.exit("No fast male model found!")
 
     if os.path.isfile("models/female_model.pkl"):
         female_model = joblib.load("models/female_model.pkl")
-        if not female_model.variable_check():
-            sys.exit("No fast female model found!")
     else:
         sys.exit("No fast female model found!")
 
@@ -55,7 +74,8 @@ def main():
     if number_of_args > 1:
         for i in range(1, number_of_args):
             try:
-                feature = gen_feature(wavfile.read(sys.argv[i]))
+                wav_rate, wav_data = wavfile.read(sys.argv[i])
+                feature = gen_feature(wav_rate, wav_data)
                 score = np.zeros(2)
                 for j in range(2):
                     score[j] = np.array(models[j].score(feature)).sum()

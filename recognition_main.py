@@ -82,11 +82,13 @@ def test_models(f_models, f_names, files):
     real_female_hits = 0
 
     for file in files:
-        feature = gen_feature(wavfile.read(file))
+        wav_rate, wav_data = wavfile.read(file)
+        feature = gen_feature(wav_rate, wav_data)
         score = np.zeros(number_of_models)
         for i in range(number_of_models):
             score[i] = np.array(f_models[i].score(feature)).sum()
-        names_output[np.argmax(score)] += 1
+        best_score = int(np.argmax(score))
+        names_output[best_score] += 1
         print(file, " : ", f_names[best_score])
         if 'K' in file and 'K' in f_names[best_score]:
             real_female_hits += 1
@@ -176,7 +178,8 @@ def main():
     if number_of_args > 1:
         for i in range(1, number_of_args):
             try:
-                feature = gen_feature(wavfile.read(sys.argv[i]))
+                wav_rate, wav_data = wavfile.read(sys.argv[i])
+                feature = gen_feature(wav_rate, wav_data)
                 score = np.zeros(2)
                 for j in range(2):
                     score[j] = np.array(models[j].score(feature)).sum()
