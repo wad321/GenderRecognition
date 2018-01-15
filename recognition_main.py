@@ -187,8 +187,8 @@ def main():
                 sys.exit(str("Cannot read argument number " + str(i) + "!"))
 
     # Method to predict from folder path (default is 'test/*.wav')
-    # if len(glob.glob("train/*.wav")) > 0:
-    #    test_models(models, names, glob.glob("train/*.wav"))  # Calculates overall accuracy, accepts .wav files,
+    # if len(glob.glob("test/*.wav")) > 0:
+    #    test_models(models, names, glob.glob("test/*.wav"))  # Calculates overall accuracy, accepts .wav files,
     # female file MUST have a letter 'K' in file name, male must NOT have a 'K' in file name
 
     male_model.save_variables()
